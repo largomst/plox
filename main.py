@@ -1,5 +1,7 @@
 import sys
 
+had_error = False
+
 
 def run_file(path):
     with open(path, 'r') as f:
@@ -31,6 +33,16 @@ def main():
         run_file(sys.argv[0])
     else:
         run_prompt()
+
+
+def error(line: int, message: str):
+    report(line, '', message)
+
+
+def report(line: int, where: str, message: str):
+    sys.stderr.write(f'[line {line}] Error{where}: {message}\n')
+    global had_error
+    had_error = True
 
 
 if __name__ == '__main__':
