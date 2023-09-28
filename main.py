@@ -7,6 +7,9 @@ def run_file(path):
     with open(path, 'r') as f:
         data = f.read()
     run(data)
+    # Indicate an error in the exit code
+    if had_error:
+        exit(65)
 
 
 def run_prompt():
