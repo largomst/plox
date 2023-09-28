@@ -18,6 +18,8 @@ def run_prompt():
         if line == '':
             break
         run(line)
+        global had_error
+        had_error = False
 
 
 def run(source):
