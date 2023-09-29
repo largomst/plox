@@ -32,7 +32,7 @@ class Token:
 
 
 class Scanner:
-    def __init__(self, source):
+    def __init__(self, source: str):
         self.source = source
         self.tokens = []
 
@@ -52,7 +52,7 @@ class Scanner:
         return self.current >= len(self.source)
 
 
-def run_file(path):
+def run_file(path: str):
     with open(path, 'r') as f:
         data = f.read()
     run(data)
@@ -71,7 +71,7 @@ def run_prompt():
         had_error = False
 
 
-def run(source):
+def run(source: str):
     pass
     # scanner = Scanner(source)
     # tokens = scanner.scan_tokens()
