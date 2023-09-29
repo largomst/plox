@@ -44,7 +44,7 @@ class Scanner:
         while not self.is_at_end():
             # We are at the beginning of the next lexeme
             self.start = self.current
-            self.scan_tokens()
+            self.scan_token()
         self.tokens.append(Token(TokenType.EOF, '', None, self.line))
         return self.tokens
 
