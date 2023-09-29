@@ -1,4 +1,5 @@
 import sys
+from dataclasses import dataclass
 from enum import Enum, auto
 
 had_error = False
@@ -17,6 +18,17 @@ TokenType = Enum(
     EOF
 """,
 )
+
+
+@dataclass
+class Token:
+    type: TokenType
+    lexme: str
+    literal: object
+    line: int
+
+    def __str__(self):
+        return f'{self.type} {self.lexeme} {self.literal}'
 
 
 def run_file(path):
