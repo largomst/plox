@@ -7,13 +7,9 @@ had_error = False
 TokenType = Enum(
     'TokenType',
     """
-    # Single-character tokens.
     LEFT_PAREN RIGHT_PAREN LEFT_BRACE RIGHT_BRACE COMMA DOT MINUS PLUS SEMICOLON SLASH STAR
-    # One or two character tokens.
     BANG BANG_EQUAL EQUAL EQUAL_EQUAL GREATER GREATER_EQUAL LESS LESS_EQUAL
-    # Literals.
     IDENTIFIER STRING NUMBER
-    # Keywords.
     AND CLASS ELSE FALSE FUN FOR IF NIL OR PRINT RETURN SUPER THIS TRUE VAR WHILE
     EOF
 """,
@@ -23,7 +19,7 @@ TokenType = Enum(
 @dataclass
 class Token:
     type: TokenType
-    lexme: str
+    lexeme: str
     literal: object
     line: int
 
@@ -210,19 +206,19 @@ def run_prompt():
 
 
 def run(source: str):
-    pass
-    # scanner = Scanner(source)
-    # tokens = scanner.scan_tokens()
-    # for token in tokens:
-    #     print(token)
+    scanner = Scanner(source)
+    tokens = scanner.scan_tokens()
+    for token in tokens:
+        print(token)
 
 
 def main():
-    if len(sys.argv) > 1:
+    if len(sys.argv) > 2:
         print('Usage: plox [scripts]')
+        print(sys.argv)
         exit(64)
-    elif len(sys.argv) == 1:
-        run_file(sys.argv[0])
+    elif len(sys.argv) == 2:
+        run_file(sys.argv[1])
     else:
         run_prompt()
 
