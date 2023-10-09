@@ -1,0 +1,28 @@
+?start: expression
+
+expression: literal
+    | unary
+    | binary
+    | grouping
+
+literal: NUMBER
+    | STRING
+    | "true"
+    | "false"
+    | "nil"
+
+grouping: "(" expression ")"
+
+unary: ( "-" | "!" ) expression
+
+binary: expression operator expression
+
+operator: "==" | "!=" | "<" | "<=" | ">" | ">=" | "+" | "-" | "*" | "/"
+
+
+STRING: LETTER+
+NUMBER: /\d+/
+LETTER: "a".."z" | "A".."Z"
+
+%import common.WS
+%ignore WS
