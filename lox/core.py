@@ -1,8 +1,9 @@
 import sys
 
+from lox.error import error, had_error, report
+from lox.parser import Parser
 from lox.scanner import Scanner, Token, TokenType
-
-had_error = False
+from lox.tool.ast_printer import AstPrinter
 
 
 def run_file(path: str):
@@ -27,8 +28,13 @@ def run_prompt():
 def run(source: str):
     scanner = Scanner(source)
     tokens = scanner.scan_tokens()
-    for token in tokens:
-        print(token)
+    parser = Parser(tokens)
+    expression = parser.parse()
+
+    if had_error:
+        return
+
+    print(AstPrinter().print(expression))
 
 
 def main():
@@ -40,16 +46,6 @@ def main():
         run_file(sys.argv[1])
     else:
         run_prompt()
-
-
-def error(line: int, message: str):
-    report(line, '', message)
-
-
-def report(line: int, where: str, message: str):
-    sys.stderr.write(f'[line {line}] Error{where}: {message}\n')
-    global had_error
-    had_error = True
 
 
 if __name__ == '__main__':
