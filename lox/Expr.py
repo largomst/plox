@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from main import Token
+from lox.scanner import Token
 
 
 class Expr(ABC):
