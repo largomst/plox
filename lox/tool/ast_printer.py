@@ -1,8 +1,7 @@
 import sys
 
-from main import Token, TokenType
-
 from lox.Expr import *
+from lox.scanner import TokenType
 
 
 class AstPrinter(Visitor):
