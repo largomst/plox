@@ -1,3 +1,6 @@
+import sys
+
+
 def error(line: int, message: str):
     report(line, '', message)
 
