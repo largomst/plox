@@ -26,7 +26,7 @@ class Parser:
             TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL
         ):
             operator = self.previous()
-            right = term()
+            right = self.term()
             expr = Binary(expr, operator, right)
         return expr
 
@@ -44,10 +44,11 @@ class Parser:
             operator = self.previous()
             right = self.unary()
             expr = Binary(expr, operator, right)
+        return expr
 
     def unary(self) -> Expr:
         if self.match(TokenType.BANG, TokenType.MINUS):
-            operator = previous()
+            operator = self.previous()
             right = self.unary()
             return Unary(operator, right)
         return self.primary()
@@ -61,14 +62,16 @@ class Parser:
             return Literal(None)
 
         if self.match(TokenType.NUMBER, TokenType.STRING):
-            return Literal(self.previous().literal)
+            previous = self.previous()
+            literal = previous.literal
+            return Literal(literal)
 
         if self.match(TokenType.LEFT_PAREN):
             expr = self.expression()
             self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
             return Grouping(expr)
 
-        raise error(self.peek(), 'Expect epxression.')
+        raise self.error(self.peek(), 'Expect epxression.')
 
     def match(self, *types: [TokenType]) -> bool:
         for type_ in types:
@@ -81,13 +84,13 @@ class Parser:
     def consume(self, type_: TokenType, message: str):
         if self.check(type_):
             return True
-        raise MyException(f'{self.peek()}, message')
+        raise MyException(f'{self.peek()}, {message}')
 
     def check(self, type_: TokenType):
         return False if self.is_at_end() else self.peek().type == type_
 
     def advance(self):
-        if self.is_at_end():
+        if not self.is_at_end():
             self.current += 1
         return self.previous()
 
@@ -102,11 +105,11 @@ class Parser:
 
     def error(self, token: Token, message: str):
         error(token, message)
-        return PraerError()
+        return ParserError()
 
     def synchronize(self):
         self.advance()
-        while self.is_at_end():
+        while not self.is_at_end():
             if self.previous().type == TokenType.SEMICOLON:
                 return
             match self.peek().type:
@@ -128,11 +131,11 @@ def error(token: Token, message: str):
         report(token.line, f' at {token.lexeme} ', message)
 
 
-class ParserError(Exception):
+class ParserError(RuntimeError):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.tokens = []
 
 
-class MyExcpetion(Exception):
+class MyException(Exception):
     pass
