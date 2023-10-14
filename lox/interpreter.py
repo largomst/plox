@@ -1,5 +1,5 @@
 from lox.Expr import Binary, Expr, Grouping, Literal, Unary, Visitor
-from lox.scanner import TokenType
+from lox.scanner import Token, TokenType
 
 
 class Interpreter(Visitor):
@@ -13,37 +13,60 @@ class Interpreter(Visitor):
         right = self.evaluate(expr.right)
         match expr.operator.type:
             case TokenType.MINUS:
+                self.check_number_operand(expr.operator, right)
                 return -float(right)
             case TokenType.BANG:
                 return not self.is_truthy(right)
+
+    def check_number_operand(self, operator: Token, operand: object):
+        if isinstance(operand, float):
+            return
+        else:
+            raise LoxRuntimeError(operator, 'Operand must be a number.')
 
     def visitBinaryExpr(self, expr: Binary):
         left = self.evaluate(expr.left)
         right = self.evaluate(expr.right)
         match expr.operator.type:
             case TokenType.MINUS:
+                self.check_number_operands(operator, left, right)
                 return float(left) - float(right)
             case TokenType.SLASH:
+                self.check_number_operands(operator, left, right)
                 return float(left) / float(right)
             case TokenType.STAR:
+                self.check_number_operands(operator, left, right)
                 return float(left) * float(right)
             case TokenType.PLUS:
                 if isinstance(left, float) and isinstance(right, float):
                     return float(left) + float(right)
                 if isinstance(left, str) and isinstance(right, str):
                     return str(left) + str(right)
+                raise LoxRuntimeError(expr.operator, 'Operands must be two numbers or strings.')
             case TokenType.GREATER:
+                self.check_number_operands(operator, left, right)
                 return float(left) > float(right)
             case TokenType.GREATER_EQUAL:
+                self.check_number_operands(operator, left, right)
                 return float(left) >= float(right)
             case TokenType.LESS:
+                self.check_number_operands(operator, left, right)
                 return float(left) < float(right)
             case TokenType.LESS_EQUAL:
+                self.check_number_operands(operator, left, right)
                 return float(left) <= float(right)
             case TokenType.BANG_EQUAL:
+                self.check_number_operands(operator, left, right)
                 return not self.is_equal(left, right)
             case TokenType.EQUAL_EQUAL:
+                self.check_number_operands(operator, left, right)
                 return self.is_equal(left, right)
+
+    def check_number_operands(self, operator: Token, left: object, right: object):
+        if isinstance(left, float) and isinstance(right, float):
+            return
+        else:
+            raise LoxRuntimeError(operator, 'Operands must be a number.')
 
     def evaluate(self, expr: Expr):
         return expr.accept(self)
@@ -61,3 +84,9 @@ class Interpreter(Visitor):
         elif isinstance(obj, bool):
             return bool(obj)
         return True
+
+
+class LoxRuntimeError(RuntimeError):
+    def __init__(self, token: Token, message: str):
+        super().__init__(message)
+        self.token = token
