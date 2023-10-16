@@ -1,3 +1,4 @@
+from lox.error import LoxRuntimeError, runtime_error
 from lox.Expr import Binary, Expr, Grouping, Literal, Unary, Visitor
 from lox.scanner import Token, TokenType
 
@@ -27,6 +28,7 @@ class Interpreter(Visitor):
     def visitBinaryExpr(self, expr: Binary):
         left = self.evaluate(expr.left)
         right = self.evaluate(expr.right)
+        operator = expr.operator
         match expr.operator.type:
             case TokenType.MINUS:
                 self.check_number_operands(operator, left, right)
@@ -85,8 +87,21 @@ class Interpreter(Visitor):
             return bool(obj)
         return True
 
+    def interpret(self, expression: Expr):
+        try:
+            value = expression.accept(self)
+            print(self.stringify(value))
+        except LoxRuntimeError as e:
+            runtime_error(e)
 
-class LoxRuntimeError(RuntimeError):
-    def __init__(self, token: Token, message: str):
-        super().__init__(message)
-        self.token = token
+    def stringify(self, obj: object):
+        if obj is None:
+            return 'nil'
+        if isinstance(obj, float):
+            text = str(obj)
+            if text.endswith('.0'):
+                text = text[: len(text) - 2]
+            return text
+        if isinstance(obj, bool):
+            return 'true' if obj else 'false'
+        return str(obj)

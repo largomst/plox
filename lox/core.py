@@ -1,9 +1,12 @@
 import sys
 
-from lox.error import error, had_error, report
+from lox.error import error, had_error, had_runtime_error, report
+from lox.interpreter import Interpreter
 from lox.parser import Parser
 from lox.scanner import Scanner, Token, TokenType
 from lox.tool.ast_printer import AstPrinter
+
+interpreter = Interpreter()
 
 
 def run_file(path: str):
@@ -13,6 +16,8 @@ def run_file(path: str):
     # Indicate an error in the exit code
     if had_error:
         exit(65)
+    if had_runtime_error:
+        exit(70)
 
 
 def run_prompt():
@@ -34,10 +39,11 @@ def run(source: str):
     if had_error:
         return
 
-    print(AstPrinter().print(expression))
+    interpreter.interpret(expression)
 
 
 def main():
+    # run('12 - (3/-"12")')
     if len(sys.argv) > 2:
         print('Usage: plox [scripts]')
         print(sys.argv)
