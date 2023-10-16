@@ -1,4 +1,8 @@
-?start: expression
+?start: program
+program: statement*
+statement: expr_stmt | print_stmt
+expr_stmt: expression
+print_stmt: "print" expression ";"
 expression: equality
 equality:  comparsion ( ( "!=" | "==" ) comparsion )*
 comparsion: term ( ( ">" | ">=" | "<" | "<=" ) term )*
