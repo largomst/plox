@@ -1,7 +1,9 @@
 ?start: program
-program: statement*
+program: declaration*
+declaration: var_decl | statement
+var_decl: "var" IDENTIFIER ( "=" expression )? ";"
 statement: expr_stmt | print_stmt
-expr_stmt: expression
+expr_stmt: expression ";"
 print_stmt: "print" expression ";"
 expression: equality
 equality:  comparsion ( ( "!=" | "==" ) comparsion )*
@@ -10,12 +12,14 @@ term: factor ( ( "-" | "+") factor )*
 factor:  unary (( "/" | "*" ) unary )*
 unary: ( "!" | "-" ) unary
      | primary
-primary: NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")"
+primary: NUMBER | STRING | BOOLEAN | NULL | "(" expression ")" | IDENTIFIER
 
 
-STRING: LETTER+
+STRING: /"[^"]*"/
 NUMBER: /\d+/
-LETTER: "a".."z" | "A".."Z"
+IDENTIFIER: /[a-zA-Z_][a-zA-Z_0-9]*/
+BOOLEAN: "true" | "false"
+NULL: "nil"
 
 %import common.WS
 %ignore WS
