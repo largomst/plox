@@ -1,7 +1,7 @@
 from lox.error import report
-from lox.Expr import Binary, Expr, Grouping, Literal, Unary
+from lox.Expr import Binary, Expr, Grouping, Literal, Unary, Variable
 from lox.scanner import Token, TokenType
-from lox.Stmt import Expression, Print
+from lox.Stmt import Expression, Print, Stmt, Var
 
 
 class Parser:
@@ -12,6 +12,21 @@ class Parser:
 
     def expression(self) -> Expr:
         return self.equality()
+
+    def declaration(self) -> Stmt:
+        try:
+            if self.match(TokenType.VAR):
+                return self.var_declaration()
+            return self.statement()
+        except ParserError as e:
+            self.synchronize()
+            return None
+
+    def var_declaration(self) -> Stmt:
+        name = self.consume(TokenType.IDENTIFIER, 'Expect variable name.')
+        initializer = self.expression() if self.match(TokenType.EQUAL) else None
+        self.consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.")
+        return Var(name, initializer)
 
     def equality(self) -> Expr:
         expr = self.comparsion()
@@ -68,6 +83,9 @@ class Parser:
             literal = previous.literal
             return Literal(literal)
 
+        if self.match(TokenType.IDENTIFIER):
+            return Variable(self.previous())
+
         if self.match(TokenType.LEFT_PAREN):
             expr = self.expression()
             self.consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.")
@@ -122,7 +140,7 @@ class Parser:
     def parse(self):
         statements = []
         while not self.is_at_end():
-            statements.append(self.statement())
+            statements.append(self.declaration())
         return statements
 
     def statement(self):

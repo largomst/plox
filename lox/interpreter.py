@@ -1,12 +1,28 @@
 from lox.error import LoxRuntimeError, runtime_error
-from lox.Expr import Binary, Expr, Grouping, Literal, Unary
+from lox.Expr import Binary, Expr, Grouping, Literal, Unary, Variable
 from lox.Expr import Visitor as eVisitor
 from lox.scanner import Token, TokenType
-from lox.Stmt import Expression, Print, Stmt
+from lox.Stmt import Expression, Print, Stmt, Var
 from lox.Stmt import Visitor as sVisitor
 
 
+class Environment:
+    def __init__(self):
+        self.values: dict[str, object] = {}
+
+    def define(self, name: str, value: object):
+        self.values[name] = value
+
+    def get(self, name: Token):
+        if name.lexeme in self.values:
+            return self.values[name.lexeme]
+        raise LoxRuntimeError(name, f'Undefined variable "{name.lexeme}".')
+
+
 class Interpreter(eVisitor, sVisitor):
+    def __init__(self):
+        self.environment = Environment()
+
     def visitLiteralExpr(self, expr: Literal):
         return expr.value
 
@@ -120,3 +136,11 @@ class Interpreter(eVisitor, sVisitor):
         value = self.evaluate(stmt.expression)
         print(self.stringify(value))
         return None
+
+    def visitVarStmt(self, stmt: Var):
+        value = None if stmt.initializer is None else self.evaluate(stmt.initializer)
+        self.environment.define(stmt.name.lexeme, value)
+        return None
+
+    def visitVariableExpr(self, expr: Variable):
+        return self.environment.get(expr.name)
