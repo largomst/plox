@@ -83,8 +83,8 @@ class Parser:
 
     def consume(self, type_: TokenType, message: str):
         if self.check(type_):
-            return True
-        raise MyException(f'{self.peek()}, {message}')
+            return self.advance()
+        raise self.error(self.peek(), message)
 
     def check(self, type_: TokenType):
         return False if self.is_at_end() else self.peek().type == type_
