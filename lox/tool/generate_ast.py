@@ -62,7 +62,7 @@ def main():
     define_ast(
         output_dir,
         'Stmt',
-        ['Expression: Expr expressoin', 'Print: Expr expression'],
+        ['Expression: Expr expression', 'Print: Expr expression'],
     )
 
 

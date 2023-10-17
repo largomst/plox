@@ -20,8 +20,8 @@ class Visitor(ABC):
 
 
 class Expression(Stmt):
-    def __init__(self, expressoin: 'Expr'):
-        self.expressoin = expressoin
+    def __init__(self, expression: 'Expr'):
+        self.expression = expression
 
     def accept(self, visitor: 'Visitor'):
         return visitor.visitExpressionStmt(self)
