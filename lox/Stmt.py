@@ -18,6 +18,10 @@ class Visitor(ABC):
     def visitPrintStmt(stmt: 'Print'):
         pass
 
+    @abstractmethod
+    def visitVarStmt(stmt: 'Var'):
+        pass
+
 
 class Expression(Stmt):
     def __init__(self, expression: 'Expr'):
@@ -33,3 +37,12 @@ class Print(Stmt):
 
     def accept(self, visitor: 'Visitor'):
         return visitor.visitPrintStmt(self)
+
+
+class Var(Stmt):
+    def __init__(self, name: 'Token', initializer: 'Expr'):
+        self.name = name
+        self.initializer = initializer
+
+    def accept(self, visitor: 'Visitor'):
+        return visitor.visitVarStmt(self)

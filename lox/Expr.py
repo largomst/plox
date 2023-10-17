@@ -26,6 +26,10 @@ class Visitor(ABC):
     def visitUnaryExpr(expr: 'Unary'):
         pass
 
+    @abstractmethod
+    def visitVariableExpr(expr: 'Variable'):
+        pass
+
 
 class Binary(Expr):
     def __init__(self, left: 'Expr', operator: 'Token', right: 'Expr'):
@@ -60,3 +64,11 @@ class Unary(Expr):
 
     def accept(self, visitor: 'Visitor'):
         return visitor.visitUnaryExpr(self)
+
+
+class Variable(Expr):
+    def __init__(self, name: 'Token'):
+        self.name = name
+
+    def accept(self, visitor: 'Visitor'):
+        return visitor.visitVariableExpr(self)
