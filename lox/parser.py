@@ -1,6 +1,7 @@
 from lox.error import report
 from lox.Expr import Binary, Expr, Grouping, Literal, Unary
 from lox.scanner import Token, TokenType
+from lox.Stmt import Expression, Print
 
 
 class Parser:
@@ -25,6 +26,7 @@ class Parser:
         while self.match(
             TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL
         ):
+
             operator = self.previous()
             right = self.term()
             expr = Binary(expr, operator, right)
@@ -118,10 +120,25 @@ class Parser:
             self.advance()
 
     def parse(self):
-        try:
-            return self.expression()
-        except ParserError as e:
-            return None
+        statements = []
+        while not self.is_at_end():
+            statements.append(self.statement())
+        return statements
+
+    def statement(self):
+        if self.match(TokenType.PRINT):
+            return self.print_statement()
+        return self.expression_statement()
+
+    def print_statement(self):
+        value = self.expression()
+        self.consume(TokenType.SEMICOLON, "Expect ';' after value.")
+        return Print(value)
+
+    def expression_statement(self):
+        expr = self.expression()
+        self.consume(TokenType.SEMICOLON, "Expect ';' after expression.")
+        return Expression(expr)
 
 
 def error(token: Token, message: str):

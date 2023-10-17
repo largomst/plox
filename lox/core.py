@@ -34,16 +34,15 @@ def run(source: str):
     scanner = Scanner(source)
     tokens = scanner.scan_tokens()
     parser = Parser(tokens)
-    expression = parser.parse()
+    statements = parser.parse()
 
     if had_error:
         return
 
-    interpreter.interpret(expression)
+    interpreter.interpret(statements)
 
 
 def main():
-    # run('12 - (3/-"12")')
     if len(sys.argv) > 2:
         print('Usage: plox [scripts]')
         print(sys.argv)

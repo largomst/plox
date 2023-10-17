@@ -1,9 +1,12 @@
 from lox.error import LoxRuntimeError, runtime_error
-from lox.Expr import Binary, Expr, Grouping, Literal, Unary, Visitor
+from lox.Expr import Binary, Expr, Grouping, Literal, Unary
+from lox.Expr import Visitor as eVisitor
 from lox.scanner import Token, TokenType
+from lox.Stmt import Expression, Print, Stmt
+from lox.Stmt import Visitor as sVisitor
 
 
-class Interpreter(Visitor):
+class Interpreter(eVisitor, sVisitor):
     def visitLiteralExpr(self, expr: Literal):
         return expr.value
 
@@ -87,12 +90,15 @@ class Interpreter(Visitor):
             return bool(obj)
         return True
 
-    def interpret(self, expression: Expr):
+    def interpret(self, statements: [Stmt]):
         try:
-            value = expression.accept(self)
-            print(self.stringify(value))
+            for statement in statements:
+                self.execute(statement)
         except LoxRuntimeError as e:
             runtime_error(e)
+
+    def execute(self, stmt: Stmt):
+        stmt.accept(self)
 
     def stringify(self, obj: object):
         if obj is None:
@@ -105,3 +111,12 @@ class Interpreter(Visitor):
         if isinstance(obj, bool):
             return 'true' if obj else 'false'
         return str(obj)
+
+    def visitExpressionStmt(self, stmt: Expression):
+        self.evaluate(stmt.expression)
+        return None
+
+    def visitPrintStmt(self, stmt: Print):
+        value = self.evaluate(stmt.expression)
+        print(self.stringify(value))
+        return None
