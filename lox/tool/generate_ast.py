@@ -4,17 +4,18 @@ from typing import List
 
 
 def define_type(f, base_name: str, class_name: str, field_list: str):
-    fields = ', '.join(
-        [': '.join(reversed(field.strip().split(' '))) for field in field_list.split(', ')]
-    )
+    fields = []
+    for field in field_list.split(', '):
+        type_, param = field.strip().split(' ')
+        fields.append(f"{param}: '{type_}'")
 
     f.write(f'class {class_name}({base_name}):\n')
-    f.write(f'    def __init__(self, {fields}):\n')
+    f.write(f'    def __init__(self, {", ".join(fields)}):\n')
     for field in field_list.split(', '):
         name = field.split(' ')[1]
         f.write(f'        self.{name} = {name}\n')
     f.write('\n')
-    f.write('    def accept(self, visitor: Visitor):\n')
+    f.write("    def accept(self, visitor: 'Visitor'):\n")
     f.write(f'        return visitor.visit{class_name}{base_name}(self)\n\n\n')
 
 
@@ -57,6 +58,11 @@ def main():
             'Literal  : object value',
             'Unary    : Token operator, Expr right',
         ],
+    )
+    define_ast(
+        output_dir,
+        'Stmt',
+        ['Expression: Expr expressoin', 'Print: Expr expression'],
     )
 
 
