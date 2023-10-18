@@ -1,5 +1,5 @@
 from lox.error import LoxRuntimeError, runtime_error
-from lox.Expr import Binary, Expr, Grouping, Literal, Unary, Variable
+from lox.Expr import Assign, Binary, Expr, Grouping, Literal, Unary, Variable
 from lox.Expr import Visitor as eVisitor
 from lox.scanner import Token, TokenType
 from lox.Stmt import Expression, Print, Stmt, Var
@@ -16,6 +16,12 @@ class Environment:
     def get(self, name: Token):
         if name.lexeme in self.values:
             return self.values[name.lexeme]
+        raise LoxRuntimeError(name, f'Undefined variable "{name.lexeme}".')
+
+    def assign(self, name: Token, value: object):
+        if name.lexeme in self.values:
+            self.values[name.lexeme] = value
+            return
         raise LoxRuntimeError(name, f'Undefined variable "{name.lexeme}".')
 
 
@@ -144,3 +150,8 @@ class Interpreter(eVisitor, sVisitor):
 
     def visitVariableExpr(self, expr: Variable):
         return self.environment.get(expr.name)
+
+    def visitAssignExpr(self, expr: Assign):
+        value = self.evaluate(expr.value)
+        self.environment.assign(expr.name, value)
+        return value

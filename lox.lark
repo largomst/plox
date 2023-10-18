@@ -5,7 +5,8 @@ var_decl: "var" IDENTIFIER ( "=" expression )? ";"
 statement: expr_stmt | print_stmt
 expr_stmt: expression ";"
 print_stmt: "print" expression ";"
-expression: equality
+expression: assignment
+assignment: IDENTIFIER "=" assignment | equality
 equality:  comparsion ( ( "!=" | "==" ) comparsion )*
 comparsion: term ( ( ">" | ">=" | "<" | "<=" ) term )*
 term: factor ( ( "-" | "+") factor )*

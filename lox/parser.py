@@ -1,5 +1,5 @@
 from lox.error import report
-from lox.Expr import Binary, Expr, Grouping, Literal, Unary, Variable
+from lox.Expr import Assign, Binary, Expr, Grouping, Literal, Unary, Variable
 from lox.scanner import Token, TokenType
 from lox.Stmt import Expression, Print, Stmt, Var
 
@@ -11,7 +11,21 @@ class Parser:
         self.current = 0
 
     def expression(self) -> Expr:
-        return self.equality()
+        return self.assignment()
+
+    def assignment(self) -> Expr:
+        """
+        这里使用了一个技巧来实现赋值表达式
+        """
+        expr = self.equality()
+        if self.match(TokenType.EQUAL):
+            equals = self.previous()
+            value = self.assignment()
+            if isinstance(expr, Variable):
+                name = expr.name
+                return Assign(name, value)
+            error(equals, 'Invalid assignment target.')
+        return expr
 
     def declaration(self) -> Stmt:
         try:
@@ -170,7 +184,3 @@ class ParserError(RuntimeError):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.tokens = []
-
-
-class MyException(Exception):
-    pass
