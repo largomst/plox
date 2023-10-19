@@ -1,13 +1,16 @@
+from typing import List
+
 from lox.error import LoxRuntimeError, runtime_error
 from lox.Expr import Assign, Binary, Expr, Grouping, Literal, Unary, Variable
 from lox.Expr import Visitor as eVisitor
 from lox.scanner import Token, TokenType
-from lox.Stmt import Expression, Print, Stmt, Var
+from lox.Stmt import Block, Expression, Print, Stmt, Var
 from lox.Stmt import Visitor as sVisitor
 
 
 class Environment:
-    def __init__(self):
+    def __init__(self, enclosing=None):
+        self.enclosing = enclosing
         self.values: dict[str, object] = {}
 
     def define(self, name: str, value: object):
@@ -16,11 +19,16 @@ class Environment:
     def get(self, name: Token):
         if name.lexeme in self.values:
             return self.values[name.lexeme]
+        if self.enclosing is not None:
+            return self.enclosing.get(name)
         raise LoxRuntimeError(name, f'Undefined variable "{name.lexeme}".')
 
     def assign(self, name: Token, value: object):
         if name.lexeme in self.values:
             self.values[name.lexeme] = value
+            return
+        if self.enclosing is not None:
+            self.enclosing.assign(name, value)
             return
         raise LoxRuntimeError(name, f'Undefined variable "{name.lexeme}".')
 
@@ -155,3 +163,16 @@ class Interpreter(eVisitor, sVisitor):
         value = self.evaluate(expr.value)
         self.environment.assign(expr.name, value)
         return value
+
+    def visitBlockStmt(self, stmt: Block):
+        self.execute_block(stmt.statements, Environment(self.environment))
+        return None
+
+    def execute_block(self, statements: List[Stmt], environment: Environment):
+        previous = self.environment
+        try:
+            self.environment = environment
+            for statement in statements:
+                self.execute(statement)
+        finally:
+            self.environment = previous

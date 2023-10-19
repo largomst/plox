@@ -65,6 +65,7 @@ def main():
         output_dir,
         'Stmt',
         [
+            'Block      : List[Stmt] statements',
             'Expression : Expr expression',
             'Print      : Expr expression',
             'Var        : Token name, Expr initializer',

@@ -1,7 +1,7 @@
 from lox.error import report
 from lox.Expr import Assign, Binary, Expr, Grouping, Literal, Unary, Variable
 from lox.scanner import Token, TokenType
-from lox.Stmt import Expression, Print, Stmt, Var
+from lox.Stmt import Block, Expression, Print, Stmt, Var
 
 
 class Parser:
@@ -160,6 +160,8 @@ class Parser:
     def statement(self):
         if self.match(TokenType.PRINT):
             return self.print_statement()
+        if self.match(TokenType.LEFT_BRACE):
+            return Block(self.block())
         return self.expression_statement()
 
     def print_statement(self):
@@ -171,6 +173,13 @@ class Parser:
         expr = self.expression()
         self.consume(TokenType.SEMICOLON, "Expect ';' after expression.")
         return Expression(expr)
+
+    def block(self):
+        statements = []
+        while not self.check(TokenType.RIGHT_BRACE) and not self.is_at_end():
+            statements.append(self.declaration())
+        self.consume(TokenType.RIGHT_BRACE, "Expect '}' after block.")
+        return statements
 
 
 def error(token: Token, message: str):

@@ -11,6 +11,10 @@ class Stmt(ABC):
 
 class Visitor(ABC):
     @abstractmethod
+    def visitBlockStmt(stmt: 'Block'):
+        pass
+
+    @abstractmethod
     def visitExpressionStmt(stmt: 'Expression'):
         pass
 
@@ -21,6 +25,14 @@ class Visitor(ABC):
     @abstractmethod
     def visitVarStmt(stmt: 'Var'):
         pass
+
+
+class Block(Stmt):
+    def __init__(self, statements: 'List[Stmt]'):
+        self.statements = statements
+
+    def accept(self, visitor: 'Visitor'):
+        return visitor.visitBlockStmt(self)
 
 
 class Expression(Stmt):
