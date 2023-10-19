@@ -1,7 +1,7 @@
 from typing import List
 
 from lox.error import LoxRuntimeError, runtime_error
-from lox.Expr import Assign, Binary, Expr, Grouping, Literal, Unary, Variable
+from lox.Expr import Assign, Binary, Expr, Grouping, Literal, Logical, Unary, Variable
 from lox.Expr import Visitor as eVisitor
 from lox.scanner import Token, TokenType
 from lox.Stmt import Block, Expression, If, Print, Stmt, Var
@@ -183,3 +183,12 @@ class Interpreter(eVisitor, sVisitor):
         elif stmt.elseBranch is not None:
             self.execute(stmt.elseBranch)
         return None
+
+    def visitLogicalExpr(self, expr: Logical):
+        left = self.evaluate(expr.left)
+        if expr.operator.type == TokenType.OR:
+            if self.is_truthy(left):
+                return left
+        elif not self.is_truthy(left):   # TokenType.AND
+            return left
+        return self.evaluate(expr.right)

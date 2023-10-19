@@ -1,5 +1,5 @@
 from lox.error import report
-from lox.Expr import Assign, Binary, Expr, Grouping, Literal, Unary, Variable
+from lox.Expr import Assign, Binary, Expr, Grouping, Literal, Logical, Unary, Variable
 from lox.scanner import Token, TokenType
 from lox.Stmt import Block, Expression, If, Print, Stmt, Var
 
@@ -17,7 +17,7 @@ class Parser:
         """
         这里使用了一个技巧来实现赋值表达式
         """
-        expr = self.equality()
+        expr = self.or_()
         if self.match(TokenType.EQUAL):
             equals = self.previous()
             value = self.assignment()
@@ -25,6 +25,22 @@ class Parser:
                 name = expr.name
                 return Assign(name, value)
             error(equals, 'Invalid assignment target.')
+        return expr
+
+    def or_(self):
+        expr = self.and_()
+        while self.match(TokenType.OR):
+            operator = self.previous()
+            right = self.and_()
+            expr = Logical(expr, operator, right)
+        return expr
+
+    def and_(self):
+        expr = self.equality()
+        while self.match(TokenType.AND):
+            operator = self.previous()
+            right = self.equality()
+            expr = Logical(expr, operator, right)
         return expr
 
     def declaration(self) -> Stmt:
