@@ -19,6 +19,10 @@ class Visitor(ABC):
         pass
 
     @abstractmethod
+    def visitIfStmt(stmt: 'If'):
+        pass
+
+    @abstractmethod
     def visitPrintStmt(stmt: 'Print'):
         pass
 
@@ -41,6 +45,16 @@ class Expression(Stmt):
 
     def accept(self, visitor: 'Visitor'):
         return visitor.visitExpressionStmt(self)
+
+
+class If(Stmt):
+    def __init__(self, condition: 'Expr', thenBranch: 'Stmt', elseBranch: 'Stmt'):
+        self.condition = condition
+        self.thenBranch = thenBranch
+        self.elseBranch = elseBranch
+
+    def accept(self, visitor: 'Visitor'):
+        return visitor.visitIfStmt(self)
 
 
 class Print(Stmt):

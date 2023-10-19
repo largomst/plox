@@ -4,7 +4,7 @@ from lox.error import LoxRuntimeError, runtime_error
 from lox.Expr import Assign, Binary, Expr, Grouping, Literal, Unary, Variable
 from lox.Expr import Visitor as eVisitor
 from lox.scanner import Token, TokenType
-from lox.Stmt import Block, Expression, Print, Stmt, Var
+from lox.Stmt import Block, Expression, If, Print, Stmt, Var
 from lox.Stmt import Visitor as sVisitor
 
 
@@ -176,3 +176,10 @@ class Interpreter(eVisitor, sVisitor):
                 self.execute(statement)
         finally:
             self.environment = previous
+
+    def visitIfStmt(self, stmt: If):
+        if self.is_truthy(self.evaluate(stmt.condition)):
+            self.execute(stmt.thenBranch)
+        elif stmt.elseBranch is not None:
+            self.execute(stmt.elseBranch)
+        return None

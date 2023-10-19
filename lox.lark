@@ -2,10 +2,11 @@
 program: declaration*
 declaration: var_decl | statement
 var_decl: "var" IDENTIFIER ( "=" expression )? ";"
-statement: expr_stmt | print_stmt | block
+statement: expr_stmt | print_stmt | block | if_stmt
 block: "{" declaration* "}"
 expr_stmt: expression ";"
 print_stmt: "print" expression ";"
+if_stmt: "if" "(" expression ")" statement ("else" statement)?
 expression: assignment
 assignment: IDENTIFIER "=" assignment | equality
 equality:  comparsion ( ( "!=" | "==" ) comparsion )*

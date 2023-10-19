@@ -5,7 +5,16 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Lox",
+      "name": "Run File",
+      "type": "python",
+      "request": "launch",
+      "module": "lox",
+      "args": ["example.lox"],
+      "justMyCode": true
+    },
+
+    {
+      "name": "Run Prompt",
       "type": "python",
       "request": "launch",
       "module": "lox",
