@@ -1,7 +1,7 @@
 from lox.error import report
 from lox.Expr import Assign, Binary, Expr, Grouping, Literal, Logical, Unary, Variable
 from lox.scanner import Token, TokenType
-from lox.Stmt import Block, Expression, If, Print, Stmt, Var
+from lox.Stmt import Block, Expression, If, Print, Stmt, Var, While
 
 
 class Parser:
@@ -178,9 +178,19 @@ class Parser:
             return self.if_statement()
         if self.match(TokenType.PRINT):
             return self.print_statement()
+        if self.match(TokenType.WHILE):
+            return self.while_statement()
         if self.match(TokenType.LEFT_BRACE):
             return Block(self.block())
         return self.expression_statement()
+
+    def while_statement(self):
+        self.consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.")
+        condition = self.expression()
+        self.consume(TokenType.RIGHT_PAREN, "Expect ')' after 'while' condition.")
+
+        body = self.statement()
+        return While(condition, body)
 
     def if_statement(self):
         self.consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'.")

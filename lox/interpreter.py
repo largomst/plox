@@ -6,6 +6,7 @@ from lox.Expr import Visitor as eVisitor
 from lox.scanner import Token, TokenType
 from lox.Stmt import Block, Expression, If, Print, Stmt, Var
 from lox.Stmt import Visitor as sVisitor
+from lox.Stmt import While
 
 
 class Environment:
@@ -192,3 +193,8 @@ class Interpreter(eVisitor, sVisitor):
         elif not self.is_truthy(left):   # TokenType.AND
             return left
         return self.evaluate(expr.right)
+
+    def visitWhileStmt(self, stmt: While):
+        while self.is_truthy(self.evaluate(stmt.condition)):
+            self.execute(stmt.body)
+        return None

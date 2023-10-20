@@ -2,11 +2,12 @@
 program: declaration*
 declaration: var_decl | statement
 var_decl: "var" IDENTIFIER ( "=" expression )? ";"
-statement: expr_stmt | print_stmt | block | if_stmt
+statement: expr_stmt | print_stmt | block | if_stmt | while_stmt
 block: "{" declaration* "}"
 expr_stmt: expression ";"
 print_stmt: "print" expression ";"
 if_stmt: "if" "(" expression ")" statement ("else" statement)?
+while_stmt: "while" "(" expression ")" statement
 expression: assignment
 assignment: IDENTIFIER "=" assignment | logic_or
 logic_or: logic_and ( "or" logic_and )*
