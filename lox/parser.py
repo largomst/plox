@@ -174,6 +174,8 @@ class Parser:
         return statements
 
     def statement(self):
+        if self.match(TokenType.FOR):
+            return self.for_statement()
         if self.match(TokenType.IF):
             return self.if_statement()
         if self.match(TokenType.PRINT):
@@ -183,6 +185,36 @@ class Parser:
         if self.match(TokenType.LEFT_BRACE):
             return Block(self.block())
         return self.expression_statement()
+
+    def for_statement(self) -> Stmt:
+        self.consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.")
+        if self.match(TokenType.SEMICOLON):
+            initializer = None
+        elif self.match(TokenType.VAR):
+            initializer = self.var_declaration()
+        else:
+            initializer = self.expression_statement()
+
+        condition = None if self.check(TokenType.SEMICOLON) else self.expression()
+        self.consume(TokenType.SEMICOLON, "Expect ';' afeter loop condition.")
+
+        increment = None if self.check(TokenType.RIGHT_PAREN) else self.expression()
+
+        self.consume(TokenType.RIGHT_PAREN, "Expect ')' for clauses.")
+        body = self.statement()
+
+        if increment is not None:
+            body = Block([body, increment])
+
+        if condition is None:
+            condition = Literal(True)
+
+        body = While(condition, body)
+
+        if initializer is not None:
+            body = Block([initializer, body])
+
+        return body
 
     def while_statement(self):
         self.consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.")
