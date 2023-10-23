@@ -8,6 +8,7 @@ expr_stmt: expression ";"
 print_stmt: "print" expression ";"
 if_stmt: "if" "(" expression ")" statement ("else" statement)?
 while_stmt: "while" "(" expression ")" statement
+for_stmt: "for" "(" ( var_decl | expr_stmt | ";" ) expression? ";" expression? ")" statement
 expression: assignment
 assignment: IDENTIFIER "=" assignment | logic_or
 logic_or: logic_and ( "or" logic_and )*
