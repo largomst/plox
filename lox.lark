@@ -17,11 +17,10 @@ equality:  comparsion ( ( "!=" | "==" ) comparsion )*
 comparsion: term ( ( ">" | ">=" | "<" | "<=" ) term )*
 term: factor ( ( "-" | "+") factor )*
 factor:  unary (( "/" | "*" ) unary )*
-unary: ( "!" | "-" ) unary
-     | primary
+unary: ( "!" | "-" ) unary | call
+call: primary ( "(" arguments? ")" )*
 primary: NUMBER | STRING | BOOLEAN | NULL | "(" expression ")" | IDENTIFIER
-
-
+arguments: expression ( "," expression )*
 STRING: /"[^"]*"/
 NUMBER: /\d+/
 IDENTIFIER: /[a-zA-Z_][a-zA-Z_0-9]*/
