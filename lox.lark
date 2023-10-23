@@ -1,6 +1,9 @@
 ?start: program
 program: declaration*
-declaration: var_decl | statement
+declaration: fun_decl | var_decl | statement
+fun_decl: "fun" function
+function: IDENTIFIER "(" parameters? ")" block
+parameters: IDENTIFIER ( "," IDENTIFIER )*
 var_decl: "var" IDENTIFIER ( "=" expression )? ";"
 statement: expr_stmt | for_stmt | if_stmt | print_stmt  | if_stmt | block
 block: "{" declaration* "}"
