@@ -36,7 +36,22 @@ class Environment:
 
 class Interpreter(eVisitor, sVisitor):
     def __init__(self):
+        self.globals_ = Environment()
         self.environment = Environment()
+
+        import time
+
+        class clock(LoxCallable):
+            def arity(self):
+                return 0
+
+            def call(self, interpreter, arguments):
+                return time.time()
+
+            def __str__(self):
+                return '<native fn>'
+
+        self.globals_.define('clock', clock)
 
     def visitLiteralExpr(self, expr: Literal):
         return expr.value
