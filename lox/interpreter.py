@@ -1,7 +1,7 @@
 from typing import List
 
 from lox.error import LoxRuntimeError, runtime_error
-from lox.Expr import Assign, Binary, Expr, Grouping, Literal, Logical, Unary, Variable
+from lox.Expr import Assign, Binary, Call, Expr, Grouping, Literal, Logical, Unary, Variable
 from lox.Expr import Visitor as eVisitor
 from lox.scanner import Token, TokenType
 from lox.Stmt import Block, Expression, If, Print, Stmt, Var
@@ -97,6 +97,19 @@ class Interpreter(eVisitor, sVisitor):
             case TokenType.EQUAL_EQUAL:
                 self.check_number_operands(operator, left, right)
                 return self.is_equal(left, right)
+
+    def visitCallExpr(self, expr: Call):
+        callee = self.evaluate(expr.callee)
+        arguments = [self.evaluate(argument) for argument in expr.arguments]
+        if not isinstance(callee, LoxCallable):
+            raise LoxRuntimeError(expr.paren, 'Can only call functions and classes.')
+        function = callee
+        # 在函数调用之前检查函数参数的数量
+        if len(arguments) != function.arity():
+            raise LoxRuntimeError(
+                f'Expected {function.arity()} arguments but got{len(arguments)}.'
+            )
+        return function.call(self, arguments)
 
     def check_number_operands(self, operator: Token, left: object, right: object):
         if isinstance(left, float) and isinstance(right, float):
@@ -198,3 +211,13 @@ class Interpreter(eVisitor, sVisitor):
         while self.is_truthy(self.evaluate(stmt.condition)):
             self.execute(stmt.body)
         return None
+
+
+class LoxCallable(ABC):
+    @abstractmethod
+    def call(self, interpreter: Interpreter, arguments: List[object]):
+        pass
+
+    @abstractmethod
+    def arity(self):
+        pass
