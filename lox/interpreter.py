@@ -38,7 +38,7 @@ class Environment:
 class Interpreter(eVisitor, sVisitor):
     def __init__(self):
         self.globals_ = Environment()
-        self.environment = Environment()
+        self.environment = self.globals_
 
         import time
 
@@ -186,6 +186,10 @@ class Interpreter(eVisitor, sVisitor):
         print(self.stringify(value))
         return None
 
+    def visitReturnStmt(self, stmt: 'Return'):
+        value = self.evaluate(stmt.value) if stmt.value != None else None
+        raise Return(value)
+
     def visitVarStmt(self, stmt: Var):
         value = None if stmt.initializer is None else self.evaluate(stmt.initializer)
         self.environment.define(stmt.name.lexeme, value)
@@ -253,7 +257,10 @@ class LoxFunction(LoxCallable):
         environment = Environment(interpreter.globals_)
         for i in range(len(self.declaration.params)):
             environment.define(self.declaration.params[i].lexeme, argument[i])
-        interpreter.execute_block(self.declaration.body, environment)
+        try:
+            interpreter.execute_block(self.declaration.body, environment)
+        except Return as return_value:
+            return return_value.value
         return None
 
     def arity(self):
@@ -261,3 +268,9 @@ class LoxFunction(LoxCallable):
 
     def __str__(self):
         return f'<fn {self.declaration.name.lexeme}>'
+
+
+class Return(LoxRuntimeError):
+    def __init__(self, value: object):
+        super().__init__(None, None)
+        self.value = value

@@ -35,6 +35,10 @@ class Visitor(ABC):
         pass
 
     @abstractmethod
+    def visitReturnStmt(stmt: 'Return'):
+        pass
+
+    @abstractmethod
     def visitWhileStmt(stmt: 'While'):
         pass
 
@@ -90,6 +94,15 @@ class Var(Stmt):
 
     def accept(self, visitor: 'Visitor'):
         return visitor.visitVarStmt(self)
+
+
+class Return(Stmt):
+    def __init__(self, keyword: 'Token', value: 'Expr'):
+        self.keyword = keyword
+        self.value = value
+
+    def accept(self, visitor: 'Visitor'):
+        return visitor.visitReturnStmt(self)
 
 
 class While(Stmt):

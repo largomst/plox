@@ -5,7 +5,8 @@ fun_decl: "fun" function
 function: IDENTIFIER "(" parameters? ")" block
 parameters: IDENTIFIER ( "," IDENTIFIER )*
 var_decl: "var" IDENTIFIER ( "=" expression )? ";"
-statement: expr_stmt | for_stmt | if_stmt | print_stmt  | if_stmt | block
+statement: expr_stmt | for_stmt | if_stmt | print_stmt  | if_stmt | block | return_stmt
+return_stmt: "return" expression ";"
 block: "{" declaration* "}"
 expr_stmt: expression ";"
 print_stmt: "print" expression ";"
