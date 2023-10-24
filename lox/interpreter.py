@@ -1,10 +1,11 @@
+from abc import ABC, abstractmethod
 from typing import List
 
 from lox.error import LoxRuntimeError, runtime_error
 from lox.Expr import Assign, Binary, Call, Expr, Grouping, Literal, Logical, Unary, Variable
 from lox.Expr import Visitor as eVisitor
 from lox.scanner import Token, TokenType
-from lox.Stmt import Block, Expression, If, Print, Stmt, Var
+from lox.Stmt import Block, Expression, Function, If, Print, Stmt, Var
 from lox.Stmt import Visitor as sVisitor
 from lox.Stmt import While
 
@@ -175,6 +176,11 @@ class Interpreter(eVisitor, sVisitor):
         self.evaluate(stmt.expression)
         return None
 
+    def visitFunctionStmt(self, stmt: Function):
+        function = LoxFunction(stmt)
+        self.environment.define(stmt.name.lexeme, function)
+        return None
+
     def visitPrintStmt(self, stmt: Print):
         value = self.evaluate(stmt.expression)
         print(self.stringify(value))
@@ -236,3 +242,22 @@ class LoxCallable(ABC):
     @abstractmethod
     def arity(self):
         pass
+
+
+class LoxFunction(LoxCallable):
+    def __init__(self, declaration: Function):
+        self.declaration = declaration
+
+    def call(self, interpreter: Interpreter, argument: List[object]) -> object:
+        # Important!!! 每次函数调用都要创建新的环境
+        environment = Environment(interpreter.globals_)
+        for i in range(len(self.declaration.params)):
+            environment.define(self.declaration.params[i].lexeme, argument[i])
+        interpreter.execute_block(self.declaration.body, environment)
+        return None
+
+    def arity(self):
+        return len(self.declaration.params)
+
+    def __str__(self):
+        return f'<fn {self.declaration.name.lexeme}>'
