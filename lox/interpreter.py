@@ -177,7 +177,7 @@ class Interpreter(eVisitor, sVisitor):
         return None
 
     def visitFunctionStmt(self, stmt: Function):
-        function = LoxFunction(stmt)
+        function = LoxFunction(stmt, self.environment)
         self.environment.define(stmt.name.lexeme, function)
         return None
 
@@ -249,12 +249,13 @@ class LoxCallable(ABC):
 
 
 class LoxFunction(LoxCallable):
-    def __init__(self, declaration: Function):
+    def __init__(self, declaration: Function, closure: Environment):
+        self.closure = closure
         self.declaration = declaration
 
     def call(self, interpreter: Interpreter, argument: List[object]) -> object:
         # Important!!! 每次函数调用都要创建新的环境
-        environment = Environment(interpreter.globals_)
+        environment = Environment(self.closure)
         for i in range(len(self.declaration.params)):
             environment.define(self.declaration.params[i].lexeme, argument[i])
         try:

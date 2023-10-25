@@ -9,7 +9,7 @@
       "type": "python",
       "request": "launch",
       "module": "lox",
-      "args": ["example2.lox"],
+      "args": ["example3.lox"],
       "justMyCode": true
     },
 
